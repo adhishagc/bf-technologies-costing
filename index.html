@@ -7,30 +7,29 @@
   <style>
     :root{
       /* Light theme palette (white + blue) */
-      --bg:#ffffff;                 /* page background */
-      --ink:#0f172a;                /* primary text (slate-900) */
-      --muted:#64748b;              /* secondary text (slate-500) */
-      --accent:#2563eb;             /* blue-600 */
-      --accent-50:#eff6ff;          /* blue-50 */
-      --accent-100:#dbeafe;         /* blue-100 */
-      --accent-200:#bfdbfe;         /* blue-200 */
-      --accent-700:#1d4ed8;         /* blue-700 */
-      --card:#ffffff;               /* card/table background */
-      --line:#e5e7eb;               /* borders (gray-200) */
-      --hover:#f8fafc;              /* row hover (slate-50) */
-      --thead:#f1f5f9;              /* table header (slate-100) */
-      --kpi-head:#0b3b8a;           /* deep blue for small headings */
+      --bg:#ffffff;
+      --ink:#0f172a;         /* text */
+      --muted:#64748b;       /* secondary text */
+      --accent:#2563eb;      /* blue-600 */
+      --accent-50:#eff6ff;   /* blue-50 */
+      --accent-100:#dbeafe;  /* blue-100 */
+      --accent-200:#bfdbfe;  /* blue-200 */
+      --accent-700:#1d4ed8;  /* blue-700 */
+      --card:#ffffff;
+      --line:#e5e7eb;
+      --hover:#f8fafc;
+      --thead:#f1f5f9;
       --shadow:0 1px 2px rgba(0,0,0,.05), 0 6px 24px rgba(2,6,23,.06);
       --radius:16px;
 
-      --good:#16a34a;   /* green */
-      --bad:#b91c1c;    /* red */
-      --pill-bg:#ecfdf5; /* green-50 */
-      --pill-br:#86efac; /* green-300 */
-      --pill-tx:#065f46; /* green-800 */
-      --pill-bg-red:#fef2f2;
-      --pill-br-red:#fecaca;
-      --pill-tx-red:#7f1d1d;
+      --good:#16a34a;        /* green */
+      --bad:#b91c1c;         /* red */
+      --pill-bg:#ecfdf5;     /* green-50 */
+      --pill-br:#86efac;     /* green-300 */
+      --pill-tx:#065f46;     /* green-800 */
+      --groupA:#f0f9ff;      /* group header: Baseline */
+      --groupB:#eef2ff;      /* group header: With BHF */
+      --groupC:#f0fdf4;      /* group header: Savings */
     }
     *{box-sizing:border-box}
     body{
@@ -46,87 +45,63 @@
     h1{font-size:28px; margin:0 0 6px 0}
     .sub{color:var(--muted); margin:0 0 24px 0}
 
+    /* KPI cards */
     .row{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
     .kpi{
-      background:var(--card);
-      border:1px solid var(--line);
-      padding:16px;
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      display:flex; flex-direction:column; gap:8px;
+      background:var(--card); border:1px solid var(--line); padding:16px;
+      border-radius:var(--radius); box-shadow:var(--shadow); display:flex; flex-direction:column; gap:8px;
     }
-    .kpi h3{margin:0; font-size:13px; font-weight:700; color:var(--kpi-head); letter-spacing:.2px}
+    .kpi h3{margin:0; font-size:13px; font-weight:700; color:#0b3b8a; letter-spacing:.2px}
     .kpi .num{font-size:22px; font-weight:800; color:var(--ink)}
     .kpi small{display:block; color:var(--muted)}
     .delta{
-      display:inline-flex; align-items:center; gap:6px;
-      font-weight:700; font-size:12px;
-      background:var(--pill-bg); color:var(--pill-tx);
-      border:1px solid var(--pill-br); border-radius:999px;
-      padding:4px 8px;
+      display:inline-flex; align-items:center; gap:6px; font-weight:700; font-size:12px;
+      background:var(--pill-bg); color:var(--pill-tx); border:1px solid var(--pill-br); border-radius:999px; padding:4px 8px;
     }
     .delta .arrow{font-weight:900}
-    .delta.bad{background:var(--pill-bg-red); color:var(--pill-tx-red); border-color:var(--pill-br-red)}
 
+    /* Panels / tables */
     .panel{
-      margin-top:24px;
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
+      margin-top:24px; background:var(--card); border:1px solid var(--line);
+      border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;
     }
     .panel h2{
       margin:0; padding:14px 16px; font-size:16px; font-weight:700;
-      border-bottom:1px solid var(--line);
-      color:#0a2e6e;
+      border-bottom:1px solid var(--line); color:#0a2e6e;
       background:linear-gradient(180deg, #ffffff, #f9fbff);
     }
     .panel .inner{padding:14px 16px}
 
     .matrix{border-collapse:separate; border-spacing:0; width:100%}
     .matrix th, .matrix td{padding:10px 12px; border-bottom:1px solid var(--line)}
-    .matrix thead th{
-      position:sticky; top:0; z-index:1;
-      background:var(--thead);
-      color:#0b3b8a;
-      font-weight:700;
-    }
+    .matrix thead th{position:sticky; top:0; z-index:1; background:var(--thead); color:#0b3b8a; font-weight:700}
+    .matrix tbody tr:hover{background:var(--hover)}
     .matrix tfoot td{font-weight:800; background:#fbfdff}
-
+    .matrix .clickable{cursor:pointer; color:#0b3b8a; font-weight:700}
     .num{text-align:right; font-variant-numeric:tabular-nums}
-
-    .filters{display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap}
-    .filters label{font-weight:600; color:#0b3b8a; display:flex; gap:8px; align-items:center}
-    .filters select{
-      background:#fff; color:var(--ink);
-      border:1px solid var(--accent-200);
-      padding:8px 10px; border-radius:10px;
-      box-shadow:0 1px 0 rgba(2,6,23,.03) inset;
-      outline:none;
-    }
-    .filters select:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-100)}
-    .legend{font-size:12px; color:var(--muted)}
-
-    .table{border-collapse:separate; border-spacing:0; width:100%;}
-    .table th,.table td{padding:10px 12px; border-bottom:1px solid var(--line)}
-    .table thead th{
-      position:sticky; top:0; z-index:2;
-      background:var(--thead);
-      color:#0b3b8a; font-weight:700;
-    }
-    .table tbody tr:hover{background:var(--hover)}
-    .badge{
-      display:inline-block; padding:3px 8px; border-radius:999px;
-      background:var(--accent-50); color:var(--accent-700);
-      border:1px solid var(--accent-200); font-size:12px; font-weight:600
-    }
-    .area{color:#0b3b8a; font-weight:600}
     .footnote{margin-top:10px; color:var(--muted); font-size:12px}
+
+    /* Drilldown */
+    .drill{border-collapse:separate; border-spacing:0; width:100%}
+    .drill th, .drill td{padding:10px 12px; border-bottom:1px solid var(--line)}
+    .drill thead th{position:sticky; top:0}
+    .groupA{background:var(--groupA)}
+    .groupB{background:var(--groupB)}
+    .groupC{background:var(--groupC)}
+    .pill{display:inline-block; padding:2px 8px; border-radius:999px; background:var(--accent-50); border:1px solid var(--accent-200); color:var(--accent-700); font-size:12px; font-weight:600}
+    .save{color:var(--good); font-weight:800}
+    .save.bad{color:var(--bad)}
+
+    /* Drilldown summary cards */
+    .mini-cards{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:10px 0 6px}
+    .mini{background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px; box-shadow:var(--shadow)}
+    .mini h4{margin:0 0 4px 0; font-size:12px; color:#0b3b8a; letter-spacing:.2px}
+    .mini .val{font-size:18px; font-weight:800}
+    .mini small{color:var(--muted)}
 
     @media (max-width:900px){
       .row{grid-template-columns:1fr 1fr}
-      .table th:nth-child(2), .table td:nth-child(2){display:none}/* hide Equipment Type on mobile */
+      .mini-cards{grid-template-columns:1fr}
     }
     @media (max-width:560px){
       .row{grid-template-columns:1fr}
@@ -136,7 +111,7 @@
 <body>
 <div class="wrap">
   <h1>BHF Technologies – Cost & Savings</h1>
-  <p class="sub">Four headline metrics with % comparisons to highlight impact. Totals update from the line items below.</p>
+  <p class="sub">Four headline metrics with % comparisons. Click <strong>Consumables / Chemicals</strong> in the matrix to expand a clear <em>Baseline vs With BHF</em> comparison.</p>
 
   <!-- KPI cards -->
   <div class="row" id="kpis"></div>
@@ -146,159 +121,95 @@
     <h2>Summary Matrix — Area × Category (per year)</h2>
     <div class="inner">
       <table class="matrix" id="matrix"></table>
+
+      <!-- Expanded drilldown -->
+      <div id="drilldownContainer" style="display:none; margin-top:14px;">
+        <div class="mini-cards" id="drillCards"></div>
+        <table class="drill" id="drill"></table>
+        <div class="footnote">Baseline reflects current-market parts (e.g., Amazon). “With BHF” applies longer life and fewer changes. Operator time assumes the same per-change handling, so fewer changes = fewer hours lost.</div>
+      </div>
+
       <div class="footnote">Areas: Equipment; Consumables / Chemicals; Utility Audit (Electricity/Heat/Water/Air); Parts; Services (Cleaning, Maintenance, etc).</div>
     </div>
   </section>
-
-  <!-- Line items -->
-  <section class="panel" style="margin-top:18px">
-    <h2>Line Items (editable in your app)</h2>
-    <div class="inner">
-      <div class="filters">
-        <label>Area
-          <select id="areaFilter">
-            <option value="all">All areas</option>
-          </select>
-        </label>
-        <label>Cost type
-          <select id="typeFilter">
-            <option value="all">All types</option>
-            <option>Operational</option>
-            <option>Downtime</option>
-            <option>Maintenance</option>
-            <option>Consumable</option>
-          </select>
-        </label>
-        <span class="legend">Click column headers to sort.</span>
-      </div>
-      <table class="table" id="lines"></table>
-      <div class="footnote" id="lineTotals"></div>
-    </div>
-  </section>
-
 </div>
 
 <script>
-// ======== Data (5 Areas & 4 cost types) ========
+/* ---------- Helpers ---------- */
 const currency = 'USD';
+const money = n => n.toLocaleString(undefined,{style:'currency',currency});
+const pct = x => `${(x*100).toFixed(1)}%`;
+const sum = (arr, key) => arr.reduce((s,r)=> s + (r[key]||0), 0);
+
+/* ---------- Dataset for KPIs/Matrix ---------- */
 const lineItems = [
-  // Utility Audit (Electricity/Air)
-  {area:'Utility Audit', resource:'Electricity', equipmentType:'Pump', item:'Feed to RO – Pump 2', costType:'Operational', baseline:24000.00, now:21600.00, notes:'50 kW × 4,800 h/yr × $0.10/kWh; 10% reduction'},
-  {area:'Utility Audit', resource:'Electricity', equipmentType:'Pump', item:'RO Treatment – Pump 3', costType:'Operational', baseline:52800.00, now:48576.00, notes:'110 kW × 4,800 h/yr × $0.10/kWh; 8% reduction'},
-  {area:'Utility Audit', resource:'Air',         equipmentType:'Compressed Air', item:'Compressed Air System', costType:'Operational', baseline:720000.00, now:684000.00, notes:'~1500 kW eq × 4,800 h/yr × $0.10/kWh; 5% reduction'},
+  // Utility Audit
+  {area:'Utility Audit', resource:'Electricity', equipmentType:'Pump', item:'Feed to RO – Pump 2', costType:'Operational', baseline:24000.00, now:21600.00},
+  {area:'Utility Audit', resource:'Electricity', equipmentType:'Pump', item:'RO Treatment – Pump 3', costType:'Operational', baseline:52800.00, now:48576.00},
+  {area:'Utility Audit', resource:'Air', equipmentType:'Compressed Air', item:'Compressed Air System', costType:'Operational', baseline:720000.00, now:684000.00},
 
-  // Consumables / Chemicals
-  {area:'Consumables / Chemicals', equipmentType:'Filter', item:'RO Prefilter 1', costType:'Consumable', baseline:7344.00, now:4920.48, notes:'144/yr → 96/yr (life/price improvement) ~33% reduction'},
-  {area:'Consumables / Chemicals', equipmentType:'Filter', item:'RO Prefilter 2', costType:'Consumable', baseline:32616.00, now:22831.20, notes:'216/yr → fewer changes; ~30% reduction'},
-  {area:'Consumables / Chemicals', equipmentType:'Membrane', item:'8" RO Membranes', costType:'Consumable', baseline:34666.67, now:25999.995, notes:'Averaged annual replacement; 25% reduction'},
+  // Consumables / Chemicals (aligned to drilldown below)
+  {area:'Consumables / Chemicals', equipmentType:'Filter',   item:'RO Prefilter 1',         costType:'Consumable', baseline:7344.00,  now:4896.00},
+  {area:'Consumables / Chemicals', equipmentType:'Filter',   item:'RO Prefilter 2',         costType:'Consumable', baseline:32616.00, now:22831.20},
+  {area:'Consumables / Chemicals', equipmentType:'Filter',   item:'CIP Filters',            costType:'Consumable', baseline:108.00,   now:81.00},
+  {area:'Consumables / Chemicals', equipmentType:'Filter',   item:'Post Treatment filters', costType:'Consumable', baseline:30492.00, now:22869.00},
+  {area:'Consumables / Chemicals', equipmentType:'Membrane', item:'8" RO Membranes',        costType:'Consumable', baseline:34666.67, now:26000.00},
 
-  // Equipment (downtime avoided)
-  {area:'Equipment', equipmentType:'Pump', item:'RO Prefilter 1', costType:'Downtime', baseline:8000.00, now:5360.00, notes:'2 h/change × 4/yr × $1,000/h; 33% fewer changeovers'},
-  {area:'Equipment', equipmentType:'Pump', item:'RO Prefilter 2', costType:'Downtime', baseline:8000.00, now:5600.00, notes:'2 h/change × 4/yr × $1,000/h; 30% fewer changeovers'},
-  {area:'Equipment', equipmentType:'RO',   item:'8" RO Membranes', costType:'Downtime', baseline:5280.00, now:3960.00, notes:'16 h event × 0.33/yr × $1,000/h; 25% fewer events'},
+  // Equipment (downtime)
+  {area:'Equipment', equipmentType:'Pump', item:'RO Prefilter 1', costType:'Downtime', baseline:8000.00, now:5360.00},
+  {area:'Equipment', equipmentType:'Pump', item:'RO Prefilter 2', costType:'Downtime', baseline:8000.00, now:5600.00},
+  {area:'Equipment', equipmentType:'RO',   item:'8" RO Membranes', costType:'Downtime', baseline:5280.00, now:3960.00},
 
   // Services
-  {area:'Services (Cleaning, Maintenance, etc)', equipmentType:'RO', item:'RO System Routine Maintenance', costType:'Maintenance', baseline:2160.00, now:1080.00, notes:'3 h/visit @ $60; monthly → bimonthly'},
-  {area:'Services (Cleaning, Maintenance, etc)', equipmentType:'RO', item:'RO CIP Cleaning (Chemicals)', costType:'Consumable', baseline:6000.00, now:4500.00, notes:'12 events → 9 events; $500 chemicals/event'},
+  {area:'Services (Cleaning, Maintenance, etc)', equipmentType:'RO', item:'RO System Routine Maintenance', costType:'Maintenance', baseline:2160.00, now:1080.00},
+  {area:'Services (Cleaning, Maintenance, etc)', equipmentType:'RO', item:'RO CIP Cleaning (Chemicals)',  costType:'Consumable',  baseline:6000.00, now:4500.00},
 
   // Parts
-  {area:'Parts', equipmentType:'Plant-wide', item:'Wear parts (seals, gaskets, etc.)', costType:'Operational', baseline:10000.00, now:8500.00, notes:'Lower ΔP/vibration reduces wear ~15%'}
+  {area:'Parts', equipmentType:'Plant-wide', item:'Wear parts (seals, gaskets, etc.)', costType:'Operational', baseline:10000.00, now:8500.00}
 ];
-
-const money = n => n.toLocaleString(undefined,{style:'currency',currency});
-const pct = (num) => `${(num*100).toFixed(1)}%`;
 lineItems.forEach(r=> r.savings = +(r.baseline - r.now).toFixed(2));
 
-// ======== Pre-computed totals ========
-const sum = (arr, key) => arr.reduce((s,r)=> s + (r[key]||0), 0);
+/* ---------- KPI / TCO ---------- */
 const totalBaseline = sum(lineItems,'baseline');
 const totalNow = sum(lineItems,'now');
 const totalSavings = sum(lineItems,'savings');
-
-// breakdown by cost type
 const byType = ['Operational','Downtime','Maintenance','Consumable'].reduce((acc,t)=>{
   const rows = lineItems.filter(r=>r.costType===t);
-  acc[t] = {
-    baseline: sum(rows,'baseline'),
-    now: sum(rows,'now'),
-    savings: sum(rows,'savings')
-  };
+  acc[t] = { baseline: sum(rows,'baseline'), now: sum(rows,'now'), savings: sum(rows,'savings') };
   return acc;
 },{});
 
-// ======== KPI labels (requested names) ========
-const kpiLabels = [
-  'Upfront Capex',
-  'Annual Operational Cost',
-  'Annual Savings',
-  '10-Year TCO'
-];
+const kpiLabels = ['Upfront Capex','Annual Operational Cost','Annual Savings','10-Year TCO'];
+const capexValue = 100000;
+const tcoBaseline10 = totalBaseline * 10;                  // pre-project
+const tcoImproved10 = capexValue + (totalNow * 10);        // with BHF
 
-// ======== Fixed Capex and TCOs ========
-const capexValue = 100000;                              // as requested
-const tcoBaseline10 = totalBaseline * 10;               // no capex in baseline (pre-project)
-const tcoImproved10 = capexValue + (totalNow * 10);     // include capex + improved annuals
-
-// ======== KPI data ========
 const kpis = [
-  {
-    label: kpiLabels[0],
-    valueText: money(capexValue),
-    sub: 'initial investment',
-    deltaText: `${pct(capexValue / (tcoImproved10||1))} of 10-Year TCO`,
-    bad: false,
-    showDelta: true
-  },
-  {
-    label: kpiLabels[1],
-    valueText: money(byType.Operational.now),
-    sub: 'post-improvement',
-    deltaText: `↓ ${pct((byType.Operational.baseline - byType.Operational.now) / (byType.Operational.baseline||1))} vs baseline`,
-    bad: false,
-    showDelta: true
-  },
-  {
-    label: kpiLabels[2],
-    valueText: money(totalSavings),
-    sub: 'per year',
-    deltaText: `${pct(totalSavings / (totalBaseline||1))} of baseline cost`,
-    bad: false,
-    showDelta: true
-  },
-  {
-    label: kpiLabels[3],
-    valueText: money(tcoImproved10),
-    sub: '10-year (incl. Capex)',
-    deltaText: `↓ ${pct((tcoBaseline10 - tcoImproved10) / (tcoBaseline10||1))} vs baseline TCO`,
-    bad: false,
-    showDelta: true
-  }
+  { label:kpiLabels[0], valueText:money(capexValue),  sub:'initial investment',             deltaText:`${pct(capexValue/(tcoImproved10||1))} of 10-Year TCO` },
+  { label:kpiLabels[1], valueText:money(byType.Operational.now), sub:'post-improvement',   deltaText:`↓ ${pct((byType.Operational.baseline-byType.Operational.now)/(byType.Operational.baseline||1))} vs baseline` },
+  { label:kpiLabels[2], valueText:money(totalSavings), sub:'per year',                     deltaText:`${pct(totalSavings/(totalBaseline||1))} of baseline cost` },
+  { label:kpiLabels[3], valueText:money(tcoImproved10), sub:'10-year (incl. Capex)',       deltaText:`↓ ${pct((tcoBaseline10 - tcoImproved10)/(tcoBaseline10||1))} vs baseline TCO` }
 ];
 
-// ======== Render KPI cards ========
 const kpiRoot = document.getElementById('kpis');
 kpis.forEach(k=>{
-  const card = document.createElement('div');
-  card.className='kpi';
-  card.innerHTML = `
-    <h3>${k.label}</h3>
+  const el=document.createElement('div');
+  el.className='kpi';
+  el.innerHTML = `<h3>${k.label}</h3>
     <div class="num">${k.valueText}</div>
-    <div>${k.sub ? `<small>${k.sub}</small>`:''}</div>
-    ${k.showDelta ? `<span class="delta ${k.bad?'bad':''}">
-      <span class="arrow">${k.bad?'↑':'↓'}</span> ${k.deltaText}
-    </span>`:''}
-  `;
-  kpiRoot.appendChild(card);
+    <div>${k.sub?`<small>${k.sub}</small>`:''}</div>
+    <span class="delta"><span class="arrow">↓</span> ${k.deltaText}</span>`;
+  kpiRoot.appendChild(el);
 });
 
-// ======== Matrix: Area × Category (display uses KPI names; shows savings columns) ========
+/* ---------- Matrix ---------- */
 function buildMatrix(){
   const types = ['Operational','Downtime','Maintenance','Consumable'];
   const byArea = {};
   lineItems.forEach(r=>{
     const a = r.area;
     byArea[a] ||= {Operational:0,Downtime:0,Maintenance:0,Consumable:0};
-    byArea[a][r.costType] += r.savings; // matrix shows savings per category
+    byArea[a][r.costType] += r.savings; // show savings in matrix
   });
 
   const areas = [
@@ -309,90 +220,172 @@ function buildMatrix(){
     'Services (Cleaning, Maintenance, etc)'
   ];
 
-  // map columns to original cost types but label with KPI names for readability
-  const typeOrder = ['Operational','Downtime','Maintenance','Consumable'];
-
-  let html = '<thead><tr><th>Area</th>' +
-             kpiLabels.map(lbl=>`<th class="num">${lbl}</th>`).join('') +
+  let html = '<thead><tr><th>Area</th>'+
+             kpiLabels.map(l=>`<th class="num">${l}</th>`).join('')+
              '<th class="num">Area Total</th></tr></thead><tbody>';
 
-  let grand = {Operational:0,Downtime:0,Maintenance:0,Consumable:0};
+  const grand = {Operational:0,Downtime:0,Maintenance:0,Consumable:0};
 
   areas.forEach(a=>{
     const r = byArea[a] || {Operational:0,Downtime:0,Maintenance:0,Consumable:0};
-    const rowTotal = typeOrder.reduce((s,t)=> s + (r[t]||0), 0);
-    typeOrder.forEach(t=> grand[t] += (r[t]||0));
-    html += `<tr><td class="area">${a}</td>`+
-            typeOrder.map(t=>`<td class="num">${money(r[t]||0)}</td>`).join('')+
-            `<td class="num"><strong>${money(rowTotal)}</strong></td></tr>`;
+    types.forEach(t=>grand[t]+=r[t]||0);
+    const total = types.reduce((s,t)=>s+(r[t]||0),0);
+    const clickable = a==='Consumables / Chemicals' ? 'clickable' : '';
+    html += `<tr data-area="${a}"><td class="${clickable}">${a}${clickable?' (click to expand)':''}</td>`+
+            types.map(t=>`<td class="num">${money(r[t]||0)}</td>`).join('')+
+            `<td class="num"><strong>${money(total)}</strong></td></tr>`;
   });
 
-  const grandTotal = typeOrder.reduce((s,t)=>s+grand[t],0);
-  html += '</tbody><tfoot><tr><td><strong>Category Total (savings)</strong></td>'+
-          typeOrder.map(t=>`<td class="num"><strong>${money(grand[t])}</strong></td>`).join('')+
-          `<td class="num"><strong>${money(grandTotal)}</strong></td></tr></tfoot>`;
+  const grandTotal = Object.values(grand).reduce((s,v)=>s+v,0);
+  html += `</tbody><tfoot><tr><td><strong>Category Total (savings)</strong></td>
+           ${['Operational','Downtime','Maintenance','Consumable'].map(t=>`<td class="num"><strong>${money(grand[t])}</strong></td>`).join('')}
+           <td class="num"><strong>${money(grandTotal)}</strong></td></tr></tfoot>`;
 
-  document.getElementById('matrix').innerHTML = html;
+  const table = document.getElementById('matrix');
+  table.innerHTML = html;
+
+  // Toggle drilldown for Consumables
+  table.querySelectorAll('tbody tr[data-area="Consumables / Chemicals"]').forEach(tr=>{
+    tr.addEventListener('click', toggleConsumables);
+  });
 }
 buildMatrix();
 
-// ======== Line items table with filtering & sorting ========
-const linesEl = document.getElementById('lines');
-const areaFilter = document.getElementById('areaFilter');
-const typeFilter = document.getElementById('typeFilter');
+/* ---------- Drilldown: Baseline vs With BHF (clear comparison) ---------- */
+const consumableDetails = [
+  { type:'RO Prefilter 1',         application:'RO Prefilter 1',           make:'Amazon',  model:'07PP003-40NNA',   tech:'3µm, 40" DOE Depth (nom)', qtyPerChange:36, pricePerUnit:51,   changesPA:4,    operatorHrsPerChange:2,   factor:0.67 },
+  { type:'RO Prefilter 2',         application:'RO Prefilter 2',           make:'Amazon',  model:'03BP005-308EAG',  tech:'5µm, 30", cd8 Spleat',      qtyPerChange:54, pricePerUnit:151,  changesPA:4,    operatorHrsPerChange:2,   factor:0.70 },
+  { type:'CIP Filters',            application:'CIP Filters',              make:'Amazon',  model:'NMO-50-P2G',      tech:'50µm dbl length 7" dia Nylon', qtyPerChange:1, pricePerUnit:27,   changesPA:4,    operatorHrsPerChange:0.5, factor:0.75 },
+  { type:'Post Treatment filters', application:'36 × 30\" post RO 0.2µm membrane', make:'Amazon', model:'16VPW002-307EAG', tech:'0.2µm membrane, 30\" c/d 7', qtyPerChange:36, pricePerUnit:847, changesPA:1,    operatorHrsPerChange:1,   factor:0.75 },
+  { type:'RO Membranes',           application:'8\" RO Membranes',         make:'Keensen', model:'40/40',           tech:'8\" RO',                      qtyPerChange:104, pricePerUnit:1000, changesPA:0.333, operatorHrsPerChange:16, factor:0.75 }
+];
 
-// build area options
-Array.from(new Set(lineItems.map(r=>r.area))).sort().forEach(a=>{
-  const opt = document.createElement('option');
-  opt.value = a; opt.textContent = a; areaFilter.appendChild(opt);
-});
+function computeRows(){
+  return consumableDetails.map(d=>{
+    const qtyYr_base = d.qtyPerChange * d.changesPA;
+    const costYr_base = qtyYr_base * d.pricePerUnit;
+    const hrsYr_base  = d.operatorHrsPerChange * d.changesPA;
 
-let sortKey = 'savings';
-let sortDir = -1; // desc
+    const changes_imp = d.changesPA * d.factor;
+    const qtyYr_imp = d.qtyPerChange * changes_imp;
+    const costYr_imp = qtyYr_imp * d.pricePerUnit;
+    const hrsYr_imp  = d.operatorHrsPerChange * changes_imp;
 
-function renderLines(){
-  const aSel = areaFilter.value; const tSel = typeFilter.value;
-  let data = lineItems.filter(r=> (aSel==='all'||r.area===aSel) && (tSel==='all'||r.costType===tSel));
-  data = data.sort((x,y)=> (x[sortKey] > y[sortKey] ? sortDir : -sortDir));
+    const saveCost = costYr_base - costYr_imp;
+    const saveHrs  = hrsYr_base  - hrsYr_imp;
+    const savePct  = saveCost / (costYr_base || 1);
 
-  const head = `<thead><tr>
-    <th data-k="area">Area</th>
-    <th data-k="equipmentType">Equipment Type</th>
-    <th data-k="item">Item / Sub-application</th>
-    <th data-k="costType">Cost Type</th>
-    <th class="num" data-k="baseline">Baseline (yr)</th>
-    <th class="num" data-k="now">New (yr)</th>
-    <th class="num" data-k="savings">Savings (yr)</th>
-    <th>Notes</th>
-  </tr></thead>`;
-
-  const body = '<tbody>'+ data.map(r=>`
-    <tr>
-      <td>${r.area}</td>
-      <td>${r.equipmentType||''}</td>
-      <td>${r.item}${r.resource?` <span class="badge">${r.resource}</span>`:''}</td>
-      <td><span class="badge">${r.costType}</span></td>
-      <td class="num">${money(r.baseline)}</td>
-      <td class="num">${money(r.now)}</td>
-      <td class="num" style="color:var(--accent); font-weight:700">${money(r.savings)}</td>
-      <td>${r.notes||''}</td>
-    </tr>`).join('') + '</tbody>';
-
-  linesEl.innerHTML = head + body;
-
-  // sortable headers
-  linesEl.querySelectorAll('th[data-k]').forEach(th=>{
-    th.style.cursor='pointer';
-    th.onclick=()=>{sortKey = th.getAttribute('data-k'); sortDir = (['item','notes','area','equipmentType','costType'].includes(sortKey)) ? 1 : -1; renderLines();};
+    return { ...d,
+      qtyYr_base, costYr_base, hrsYr_base,
+      changes_imp, qtyYr_imp, costYr_imp, hrsYr_imp,
+      saveCost, saveHrs, savePct
+    };
   });
-
-  // totals under the table (for the filtered view)
-  const sumFiltered = data.reduce((s,r)=> s+r.savings, 0);
-  document.getElementById('lineTotals').textContent = `Filtered total savings: ${money(sumFiltered)} per year`;
 }
 
-areaFilter.onchange = typeFilter.onchange = renderLines;
-renderLines();
+function renderDrill(){
+  const rows = computeRows();
+
+  // Summary mini-cards (Top of drilldown)
+  const baseTotal = rows.reduce((s,r)=>s+r.costYr_base,0);
+  const impTotal  = rows.reduce((s,r)=>s+r.costYr_imp,0);
+  const hrsBase   = rows.reduce((s,r)=>s+r.hrsYr_base,0);
+  const hrsImp    = rows.reduce((s,r)=>s+r.hrsYr_imp,0);
+  const saveTotal = baseTotal - impTotal;
+
+  document.getElementById('drillCards').innerHTML = `
+    <div class="mini"><h4>Baseline Consumables Cost (yr)</h4><div class="val">${money(baseTotal)}</div><small>${hrsBase.toFixed(1)} operator hrs/yr</small></div>
+    <div class="mini"><h4>With BHF Consumables Cost (yr)</h4><div class="val">${money(impTotal)}</div><small>${hrsImp.toFixed(1)} operator hrs/yr</small></div>
+    <div class="mini"><h4>Annual Savings (Consumables)</h4><div class="val save">↓ ${money(saveTotal)} (${pct(saveTotal/(baseTotal||1))})</div><small>fewer changes, longer life</small></div>
+  `;
+
+  // Table with grouped headers: Baseline vs With BHF vs Savings
+  const head = `
+    <thead>
+      <tr>
+        <th rowspan="2">Type</th>
+        <th rowspan="2">Application / Description</th>
+        <th rowspan="2">Make</th>
+        <th rowspan="2">Model</th>
+        <th rowspan="2">Tech info</th>
+        <th rowspan="2" class="num">Qty/change</th>
+        <th colspan="4" class="groupA">Baseline</th>
+        <th colspan="4" class="groupB">With BHF</th>
+        <th colspan="2" class="groupC">Savings</th>
+      </tr>
+      <tr>
+        <th class="groupA num">Changes/yr</th>
+        <th class="groupA num">Qty/yr</th>
+        <th class="groupA num">Cost/yr</th>
+        <th class="groupA num">Op. hrs/yr</th>
+
+        <th class="groupB num">Changes/yr</th>
+        <th class="groupB num">Qty/yr</th>
+        <th class="groupB num">Cost/yr</th>
+        <th class="groupB num">Op. hrs/yr</th>
+
+        <th class="groupC num">Cost saved/yr</th>
+        <th class="groupC num">% saved</th>
+      </tr>
+    </thead>`;
+
+  const body = '<tbody>' + rows.map(r=>`
+    <tr>
+      <td><span class="pill">${r.type}</span></td>
+      <td>${r.application}</td>
+      <td>${r.make}</td>
+      <td>${r.model}</td>
+      <td>${r.tech}</td>
+      <td class="num">${r.qtyPerChange.toLocaleString()}</td>
+
+      <td class="num">${r.changesPA.toFixed(2)}</td>
+      <td class="num">${r.qtyYr_base.toFixed(2)}</td>
+      <td class="num">${money(r.costYr_base)}</td>
+      <td class="num">${r.hrsYr_base.toFixed(1)}</td>
+
+      <td class="num">${r.changes_imp.toFixed(2)}</td>
+      <td class="num">${r.qtyYr_imp.toFixed(2)}</td>
+      <td class="num">${money(r.costYr_imp)}</td>
+      <td class="num">${r.hrsYr_imp.toFixed(1)}</td>
+
+      <td class="num save">↓ ${money(r.saveCost)}</td>
+      <td class="num save">${pct(r.savePct)}</td>
+    </tr>
+  `).join('') + '</tbody>';
+
+  const foot = `
+    <tfoot>
+      <tr>
+        <td colspan="7"><strong>Totals</strong></td>
+        <td class="num"><strong>${rows.reduce((s,r)=>s+r.qtyYr_base,0).toFixed(2)}</strong></td>
+        <td class="num"><strong>${money(baseTotal)}</strong></td>
+        <td class="num"><strong>${hrsBase.toFixed(1)}</strong></td>
+
+        <td class="num"><strong>${rows.reduce((s,r)=>s+r.changes_imp,0).toFixed(2)}</strong></td>
+        <td class="num"><strong>${rows.reduce((s,r)=>s+r.qtyYr_imp,0).toFixed(2)}</strong></td>
+        <td class="num"><strong>${money(impTotal)}</strong></td>
+        <td class="num"><strong>${hrsImp.toFixed(1)}</strong></td>
+
+        <td class="num save"><strong>↓ ${money(saveTotal)}</strong></td>
+        <td class="num save"><strong>${pct(saveTotal/(baseTotal||1))}</strong></td>
+      </tr>
+    </tfoot>`;
+
+  document.getElementById('drill').innerHTML = head + body + foot;
+}
+
+let drillOpen = false;
+function toggleConsumables(){
+  drillOpen = !drillOpen;
+  const box = document.getElementById('drilldownContainer');
+  if(drillOpen){
+    renderDrill();
+    box.style.display = 'block';
+    box.scrollIntoView({behavior:'smooth', block:'start'});
+  }else{
+    box.style.display = 'none';
+  }
+}
 </script>
 </body>
 </html>
