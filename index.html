@@ -117,14 +117,14 @@
 <body>
 <div class="wrap">
   <h1>BHF Technologies – Cost Savings</h1>
-  <p class="sub">Five Areas → four Cost Types. Totals update from the line items below.</p>
+  <p class="sub">Five Areas → four categories. Totals update from the line items below.</p>
 
-  <!-- KPI cards by cost type -->
+  <!-- KPI cards -->
   <div class="row" id="kpis"></div>
 
-  <!-- Area × Cost Type matrix -->
+  <!-- Area × Category matrix -->
   <section class="panel">
-    <h2>Summary Matrix — Area × Cost Type (Savings per year)</h2>
+    <h2>Summary Matrix — Area × Category (per year)</h2>
     <div class="inner">
       <table class="matrix" id="matrix"></table>
       <div class="footnote">Areas: Equipment; Consumables / Chemicals; Utility Audit (Electricity/Heat/Water/Air); Parts; Services (Cleaning, Maintenance, etc).</div>
@@ -171,12 +171,12 @@ const lineItems = [
   // Consumables / Chemicals
   {area:'Consumables / Chemicals', equipmentType:'Filter', item:'RO Prefilter 1', costType:'Consumable', baseline:7344.00, now:4920.48, notes:'144/yr → 96/yr (life/price improvement) ~33% reduction'},
   {area:'Consumables / Chemicals', equipmentType:'Filter', item:'RO Prefilter 2', costType:'Consumable', baseline:32616.00, now:22831.20, notes:'216/yr → fewer changes; ~30% reduction'},
-  {area:'Consumables / Chemicals', equipmentType:'Membrane', item:'8\" RO Membranes', costType:'Consumable', baseline:34666.67, now:25999.995, notes:'Averaged annual replacement; 25% reduction'},
+  {area:'Consumables / Chemicals', equipmentType:'Membrane', item:'8" RO Membranes', costType:'Consumable', baseline:34666.67, now:25999.995, notes:'Averaged annual replacement; 25% reduction'},
 
   // Equipment (downtime avoided)
   {area:'Equipment', equipmentType:'Pump', item:'RO Prefilter 1', costType:'Downtime', baseline:8000.00, now:5360.00, notes:'2 h/change × 4/yr × $1,000/h; 33% fewer changeovers'},
   {area:'Equipment', equipmentType:'Pump', item:'RO Prefilter 2', costType:'Downtime', baseline:8000.00, now:5600.00, notes:'2 h/change × 4/yr × $1,000/h; 30% fewer changeovers'},
-  {area:'Equipment', equipmentType:'RO',   item:'8\" RO Membranes', costType:'Downtime', baseline:5280.00, now:3960.00, notes:'16 h event × 0.33/yr × $1,000/h; 25% fewer events'},
+  {area:'Equipment', equipmentType:'RO',   item:'8" RO Membranes', costType:'Downtime', baseline:5280.00, now:3960.00, notes:'16 h event × 0.33/yr × $1,000/h; 25% fewer events'},
 
   // Services
   {area:'Services (Cleaning, Maintenance, etc)', equipmentType:'RO', item:'RO System Routine Maintenance', costType:'Maintenance', baseline:2160.00, now:1080.00, notes:'3 h/visit @ $60; monthly → bimonthly'},
@@ -192,19 +192,28 @@ const money = n => n.toLocaleString(undefined,{style:'currency',currency})
 // add computed savings to items
 lineItems.forEach(r=> r.savings = +(r.baseline - r.now).toFixed(2));
 
-// ======== KPI cards (totals by cost type) ========
+// ======== Categories & labels ========
 const types = ['Operational','Downtime','Maintenance','Consumable'];
+const kpiLabels = [
+  'Upfront Capex',
+  'Annual Operational Cost',
+  'Annual Savings',
+  '10-Year TCO'
+];
+
+// ======== KPI cards with new labels ========
 const totalsByType = Object.fromEntries(types.map(t=>[t,0]));
 lineItems.forEach(r=> totalsByType[r.costType]+=r.savings);
+
 const kpiRoot = document.getElementById('kpis');
-['Operational','Downtime','Maintenance','Consumable'].forEach(t=>{
+types.forEach((t, i)=>{
   const card = document.createElement('div');
   card.className='kpi';
-  card.innerHTML = `<h3>${t} Savings</h3><div class="num">${money(totalsByType[t])}</div><small>per year</small>`;
+  card.innerHTML = `<h3>${kpiLabels[i]}</h3><div class="num">${money(totalsByType[t])}</div><small>per year</small>`;
   kpiRoot.appendChild(card);
 });
 
-// ======== Matrix: Area × Cost Type ========
+// ======== Matrix: Area × Category (display uses new labels) ========
 function buildMatrix(){
   // group by Area
   const byArea = {};
@@ -223,7 +232,7 @@ function buildMatrix(){
   ];
 
   let html = '<thead><tr><th>Area</th>' +
-             types.map(t=>`<th class="num">${t}</th>`).join('') +
+             kpiLabels.map(lbl=>`<th class="num">${lbl}</th>`).join('') +
              '<th class="num">Area Total</th></tr></thead><tbody>';
 
   let grand = {Operational:0,Downtime:0,Maintenance:0,Consumable:0};
@@ -238,7 +247,7 @@ function buildMatrix(){
   });
 
   const grandTotal = types.reduce((s,t)=>s+grand[t],0);
-  html += '</tbody><tfoot><tr><td><strong>Cost Type Total</strong></td>'+
+  html += '</tbody><tfoot><tr><td><strong>Category Total</strong></td>'+
           types.map(t=>`<td class="num"><strong>${money(grand[t])}</strong></td>`).join('')+
           `<td class="num"><strong>${money(grandTotal)}</strong></td></tr></tfoot>`;
 
@@ -293,7 +302,7 @@ function renderLines(){
   // sortable headers
   linesEl.querySelectorAll('th[data-k]').forEach(th=>{
     th.style.cursor='pointer';
-    th.onclick=()=>{sortKey = th.getAttribute('data-k'); sortDir = sortKey==='item'||sortKey==='notes'||sortKey==='area'||sortKey==='equipmentType'||sortKey==='costType' ? 1 : -1; renderLines();};
+    th.onclick=()=>{sortKey = th.getAttribute('data-k'); sortDir = (['item','notes','area','equipmentType','costType'].includes(sortKey)) ? 1 : -1; renderLines();};
   });
 
   // totals under the table (for the filtered view)
