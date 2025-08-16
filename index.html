@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BHF Technologies – Cost Savings View</title>
+  <title>BHF Technologies – Cost & Savings View</title>
   <style>
     :root{
       /* Light theme palette (white + blue) */
@@ -22,6 +22,15 @@
       --kpi-head:#0b3b8a;           /* deep blue for small headings */
       --shadow:0 1px 2px rgba(0,0,0,.05), 0 6px 24px rgba(2,6,23,.06);
       --radius:16px;
+
+      --good:#16a34a;   /* green */
+      --bad:#b91c1c;    /* red */
+      --pill-bg:#ecfdf5; /* green-50 */
+      --pill-br:#86efac; /* green-300 */
+      --pill-tx:#065f46; /* green-800 */
+      --pill-bg-red:#fef2f2;
+      --pill-br-red:#fecaca;
+      --pill-tx-red:#7f1d1d;
     }
     *{box-sizing:border-box}
     body{
@@ -44,10 +53,20 @@
       padding:16px;
       border-radius:var(--radius);
       box-shadow:var(--shadow);
+      display:flex; flex-direction:column; gap:8px;
     }
-    .kpi h3{margin:0 0 6px 0; font-size:13px; font-weight:700; color:var(--kpi-head); letter-spacing:.2px}
+    .kpi h3{margin:0; font-size:13px; font-weight:700; color:var(--kpi-head); letter-spacing:.2px}
     .kpi .num{font-size:22px; font-weight:800; color:var(--ink)}
     .kpi small{display:block; color:var(--muted)}
+    .delta{
+      display:inline-flex; align-items:center; gap:6px;
+      font-weight:700; font-size:12px;
+      background:var(--pill-bg); color:var(--pill-tx);
+      border:1px solid var(--pill-br); border-radius:999px;
+      padding:4px 8px;
+    }
+    .delta .arrow{font-weight:900}
+    .delta.bad{background:var(--pill-bg-red); color:var(--pill-tx-red); border-color:var(--pill-br-red)}
 
     .panel{
       margin-top:24px;
@@ -116,8 +135,8 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>BHF Technologies – Cost Savings</h1>
-  <p class="sub">Five Areas → four categories. Totals update from the line items below.</p>
+  <h1>BHF Technologies – Cost & Savings</h1>
+  <p class="sub">Four headline metrics with % comparisons to highlight impact. Totals update from the line items below.</p>
 
   <!-- KPI cards -->
   <div class="row" id="kpis"></div>
@@ -160,7 +179,7 @@
 </div>
 
 <script>
-// ======== Data (exactly aligned to your 5 Areas & 4 Cost Types) ========
+// ======== Data (5 Areas & 4 cost types) ========
 const currency = 'USD';
 const lineItems = [
   // Utility Audit (Electricity/Air)
@@ -186,14 +205,28 @@ const lineItems = [
   {area:'Parts', equipmentType:'Plant-wide', item:'Wear parts (seals, gaskets, etc.)', costType:'Operational', baseline:10000.00, now:8500.00, notes:'Lower ΔP/vibration reduces wear ~15%'}
 ];
 
-// convenience
-const money = n => n.toLocaleString(undefined,{style:'currency',currency})
-
-// add computed savings to items
+const money = n => n.toLocaleString(undefined,{style:'currency',currency});
+const pct = (num) => `${(num*100).toFixed(1)}%`;
 lineItems.forEach(r=> r.savings = +(r.baseline - r.now).toFixed(2));
 
-// ======== Categories & labels ========
-const types = ['Operational','Downtime','Maintenance','Consumable'];
+// ======== Pre-computed totals ========
+const sum = (arr, key) => arr.reduce((s,r)=> s + (r[key]||0), 0);
+const totalBaseline = sum(lineItems,'baseline');
+const totalNow = sum(lineItems,'now');
+const totalSavings = sum(lineItems,'savings');
+
+// breakdown by cost type
+const byType = ['Operational','Downtime','Maintenance','Consumable'].reduce((acc,t)=>{
+  const rows = lineItems.filter(r=>r.costType===t);
+  acc[t] = {
+    baseline: sum(rows,'baseline'),
+    now: sum(rows,'now'),
+    savings: sum(rows,'savings')
+  };
+  return acc;
+},{});
+
+// ======== KPI labels (requested names) ========
 const kpiLabels = [
   'Upfront Capex',
   'Annual Operational Cost',
@@ -201,26 +234,71 @@ const kpiLabels = [
   '10-Year TCO'
 ];
 
-// ======== KPI cards with new labels ========
-const totalsByType = Object.fromEntries(types.map(t=>[t,0]));
-lineItems.forEach(r=> totalsByType[r.costType]+=r.savings);
+// ======== Fixed Capex and TCOs ========
+const capexValue = 100000;                              // as requested
+const tcoBaseline10 = totalBaseline * 10;               // no capex in baseline (pre-project)
+const tcoImproved10 = capexValue + (totalNow * 10);     // include capex + improved annuals
 
+// ======== KPI data ========
+const kpis = [
+  {
+    label: kpiLabels[0],
+    valueText: money(capexValue),
+    sub: 'initial investment',
+    deltaText: `${pct(capexValue / (tcoImproved10||1))} of 10-Year TCO`,
+    bad: false,
+    showDelta: true
+  },
+  {
+    label: kpiLabels[1],
+    valueText: money(byType.Operational.now),
+    sub: 'post-improvement',
+    deltaText: `↓ ${pct((byType.Operational.baseline - byType.Operational.now) / (byType.Operational.baseline||1))} vs baseline`,
+    bad: false,
+    showDelta: true
+  },
+  {
+    label: kpiLabels[2],
+    valueText: money(totalSavings),
+    sub: 'per year',
+    deltaText: `${pct(totalSavings / (totalBaseline||1))} of baseline cost`,
+    bad: false,
+    showDelta: true
+  },
+  {
+    label: kpiLabels[3],
+    valueText: money(tcoImproved10),
+    sub: '10-year (incl. Capex)',
+    deltaText: `↓ ${pct((tcoBaseline10 - tcoImproved10) / (tcoBaseline10||1))} vs baseline TCO`,
+    bad: false,
+    showDelta: true
+  }
+];
+
+// ======== Render KPI cards ========
 const kpiRoot = document.getElementById('kpis');
-types.forEach((t, i)=>{
+kpis.forEach(k=>{
   const card = document.createElement('div');
   card.className='kpi';
-  card.innerHTML = `<h3>${kpiLabels[i]}</h3><div class="num">${money(totalsByType[t])}</div><small>per year</small>`;
+  card.innerHTML = `
+    <h3>${k.label}</h3>
+    <div class="num">${k.valueText}</div>
+    <div>${k.sub ? `<small>${k.sub}</small>`:''}</div>
+    ${k.showDelta ? `<span class="delta ${k.bad?'bad':''}">
+      <span class="arrow">${k.bad?'↑':'↓'}</span> ${k.deltaText}
+    </span>`:''}
+  `;
   kpiRoot.appendChild(card);
 });
 
-// ======== Matrix: Area × Category (display uses new labels) ========
+// ======== Matrix: Area × Category (display uses KPI names; shows savings columns) ========
 function buildMatrix(){
-  // group by Area
+  const types = ['Operational','Downtime','Maintenance','Consumable'];
   const byArea = {};
   lineItems.forEach(r=>{
     const a = r.area;
     byArea[a] ||= {Operational:0,Downtime:0,Maintenance:0,Consumable:0};
-    byArea[a][r.costType] += r.savings;
+    byArea[a][r.costType] += r.savings; // matrix shows savings per category
   });
 
   const areas = [
@@ -231,6 +309,9 @@ function buildMatrix(){
     'Services (Cleaning, Maintenance, etc)'
   ];
 
+  // map columns to original cost types but label with KPI names for readability
+  const typeOrder = ['Operational','Downtime','Maintenance','Consumable'];
+
   let html = '<thead><tr><th>Area</th>' +
              kpiLabels.map(lbl=>`<th class="num">${lbl}</th>`).join('') +
              '<th class="num">Area Total</th></tr></thead><tbody>';
@@ -239,16 +320,16 @@ function buildMatrix(){
 
   areas.forEach(a=>{
     const r = byArea[a] || {Operational:0,Downtime:0,Maintenance:0,Consumable:0};
-    const rowTotal = types.reduce((s,t)=> s + (r[t]||0), 0);
-    types.forEach(t=> grand[t] += (r[t]||0));
+    const rowTotal = typeOrder.reduce((s,t)=> s + (r[t]||0), 0);
+    typeOrder.forEach(t=> grand[t] += (r[t]||0));
     html += `<tr><td class="area">${a}</td>`+
-            types.map(t=>`<td class="num">${money(r[t]||0)}</td>`).join('')+
+            typeOrder.map(t=>`<td class="num">${money(r[t]||0)}</td>`).join('')+
             `<td class="num"><strong>${money(rowTotal)}</strong></td></tr>`;
   });
 
-  const grandTotal = types.reduce((s,t)=>s+grand[t],0);
-  html += '</tbody><tfoot><tr><td><strong>Category Total</strong></td>'+
-          types.map(t=>`<td class="num"><strong>${money(grand[t])}</strong></td>`).join('')+
+  const grandTotal = typeOrder.reduce((s,t)=>s+grand[t],0);
+  html += '</tbody><tfoot><tr><td><strong>Category Total (savings)</strong></td>'+
+          typeOrder.map(t=>`<td class="num"><strong>${money(grand[t])}</strong></td>`).join('')+
           `<td class="num"><strong>${money(grandTotal)}</strong></td></tr></tfoot>`;
 
   document.getElementById('matrix').innerHTML = html;
@@ -306,8 +387,8 @@ function renderLines(){
   });
 
   // totals under the table (for the filtered view)
-  const sum = data.reduce((s,r)=> s+r.savings, 0);
-  document.getElementById('lineTotals').textContent = `Filtered total savings: ${money(sum)} per year`;
+  const sumFiltered = data.reduce((s,r)=> s+r.savings, 0);
+  document.getElementById('lineTotals').textContent = `Filtered total savings: ${money(sumFiltered)} per year`;
 }
 
 areaFilter.onchange = typeFilter.onchange = renderLines;
